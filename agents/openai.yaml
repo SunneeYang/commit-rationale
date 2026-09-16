@@ -1,0 +1,3 @@
+interface:
+  display_name: "Commit Rationale"
+  short_description: "Preserve the why that code and diff cannot explain"
