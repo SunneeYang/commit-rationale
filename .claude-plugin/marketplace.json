@@ -1,0 +1,16 @@
+{
+  "name": "commit-rationale",
+  "owner": {
+    "name": "SunneeYang"
+  },
+  "metadata": {
+    "description": "Git 提交背景的写入与读取插件。"
+  },
+  "plugins": [
+    {
+      "name": "commit-rationale",
+      "source": "./plugins/commit-rationale",
+      "description": "保留有维护价值的提交背景，并按需读取历史约束。"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "commit-rationale",
+  "interface": {
+    "displayName": "Commit Rationale"
+  },
+  "plugins": [
+    {
+      "name": "commit-rationale",
+      "source": {
+        "source": "local",
+        "path": "./plugins/commit-rationale"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

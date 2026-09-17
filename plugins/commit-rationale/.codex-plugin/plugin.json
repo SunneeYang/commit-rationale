@@ -1,0 +1,19 @@
+{
+  "name": "commit-rationale",
+  "version": "0.1.0+codex.20260917123001",
+  "description": "保留有维护价值的提交背景，并在后续开发中按需读取。",
+  "author": {
+    "name": "SunneeYang"
+  },
+  "repository": "https://github.com/SunneeYang/commit-rationale",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Commit Rationale",
+    "shortDescription": "记录有价值的提交背景，按需读取历史约束。",
+    "longDescription": "根据当前上下文筛选提交正文，并在会话启动、恢复或压缩后提醒 Agent 按需读取相关提交的完整说明。",
+    "developerName": "SunneeYang",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "根据未提交改动生成提交信息。"
+  }
+}

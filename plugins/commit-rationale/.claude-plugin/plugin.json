@@ -1,0 +1,9 @@
+{
+  "name": "commit-rationale",
+  "version": "0.1.0+codex.20260917123001",
+  "description": "保留有维护价值的提交背景，并在后续开发中按需读取。",
+  "author": {
+    "name": "SunneeYang"
+  },
+  "repository": "https://github.com/SunneeYang/commit-rationale"
+}
