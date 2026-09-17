@@ -1,128 +1,53 @@
 ---
 name: commit-rationale
-description: Write Git commit messages that preserve useful rationale and context not recoverable from code or diff. Use when preparing a commit, drafting or improving its message, or preserving context during an authorized amend, squash, or merge. Do not use for code review or impact analysis alone.
+description: 在准备或执行 Git 提交、撰写或改进提交说明，以及已获授权的 amend、squash、merge 时使用。根据当前上下文保留代码和 diff 无法还原的重要背景。仅做代码审查或影响分析时不使用。
 ---
 
 # Commit Rationale
 
-Write an ordinary commit subject. Add a body only for supported information that
-future maintainers may need and cannot reliably recover from the code and diff.
-A subject-only message is a complete, valid result.
+根据当前可用上下文和实际改动，裁决哪些信息值得长期保留在提交记录中。
 
-## Establish the change and its context
+## 判断要记录什么
 
-- Read repository instructions and recent commit messages for language and style.
-  Follow the user's preference; do not impose Conventional Commits on a repository
-  that does not use them.
-- Check the repository, branch, working tree, index, and intended commit scope.
-  Read the actual diff to be committed and enough surrounding code to understand
-  it. Keep staged, unstaged, and unrelated changes distinct. For a message-only
-  request, inspect the supplied or requested diff without changing the index.
-- Use relevant task conversation, user requirements, recorded decisions, actual
-  verification results, and available durable references. Read linked material
-  only as needed to establish a fact; do not search unrelated private history.
-- Separate observed behavior from historical intent. A plausible explanation
-  inferred from a diff is not evidence of why the author made the change. When a
-  human wrote the code and the agent only prepares the commit, do not invent a
-  development narrative or imply agent authorship. User-supplied rationale can
-  still be valuable in that case.
+1. 阅读仓库要求、近期提交风格和本次实际 diff，确认提交范围，区分暂存、未暂存和无关改动。
+2. 回顾当前任务中的需求、讨论、约束、决策和实际验证结果。只读取与本次改动有关且必要的资料。
+3. 判断每条背景是否**有依据、对未来维护有用、无法从代码和 diff 可靠恢复**。三者都满足才写入正文，例如外部约束、方案取舍、刻意保留的限制、重要验证结果或缺口。
 
-## Keep only information worth preserving
+区分最终做法与选择它的原因：代码或文档已经写明做法，不代表其背后的约束和取舍也已被记录；原因本身已充分表达时，无需重复。
 
-For each possible body detail, ask: **Is it supported, useful for maintaining this
-change, and difficult to recover from code and diff?** Keep it only if all three
-conditions hold. Useful examples include:
+完成上述判断后，没有值得保留的背景就只写标题。不要默认省略正文，也不要为了有正文而凑内容。缺少普通改动的动机无需追问；只有影响准确说明或安全提交的关键歧义才需要澄清。
 
-- External business, client, compatibility, or operational constraints.
-- Why a non-obvious choice was made, including a rejected alternative when its
-  rejection explains a lasting tradeoff.
-- An intentional limitation, temporary workaround, or condition for removing it.
-- Material verification evidence or gaps: what was actually checked, its outcome,
-  and a relevant limitation. Distinguish a user-reported result from a result you
-  observed; never turn a planned check into a passed check.
+不从 diff 猜测作者动机，不把计划执行的检查写成通过。人工修改、Agent 代为提交时，仍可使用用户给出的背景，但不编造开发过程或暗示 Agent 编写了代码。
 
-Omit file inventories, implementation walkthroughs, diff paraphrases, routine
-progress logs, speculative impact/risk labels, and empty statements such as
-"No special decisions." Do not copy raw chats, internal reasoning transcripts,
-credentials, or private operational details into permanent Git history. Preserve
-the necessary engineering fact in a concise, shareable form.
+## 写提交说明
 
-Missing rationale is not a blocker by itself. Omit unsupported claims rather than
-asking the user to explain every ordinary change. Ask a focused question only
-when a material ambiguity prevents an accurate message or a safe requested commit.
+- **标题**：简洁描述最终改动，遵循用户指定的语言和仓库风格，不强推 Conventional Commits。
+- **正文**：与标题空一行，用必要的自然语言说明背景；不固定章节、顺序或长度。省略 diff 复述、文件清单、流水账和空洞表态。验证信息应区分亲自观察与用户报告，说明有意义的范围和限制。
+- **Trailers**：可选，只放已知、稳定的外部引用或有依据的标准元数据，遵循仓库惯例；使用 Git 原生支持，放在末尾并与正文空行分隔。不得编造任务编号、署名、审核或测试背书。
 
-## Compose the message
+默认不添加 `Agent`、`Agent-Context-Version`、模型、会话等专有字段。遵守明确的元数据要求，但不猜测未知值。不要为正文引入 schema、解析器或强制格式的 hook。
 
-- **Subject:** Describe the final change concisely in the repository's style.
-- **Body:** Use the shortest natural-language explanation that preserves the
-  relevant facts. Leave one blank line after the subject. There is no required
-  schema, section order, or minimum length. Use paragraphs or bullets as useful;
-  do not require `Intent`, `Constraints`, `Decision`, or `Verification` headings.
-- **Trailers:** Optional. Use stable, known external references such as `Task-Ref`
-  or `ADR-Ref` when useful and consistent with repository conventions. Preserve
-  standard trailers with their actual meaning; never invent IDs, sign-offs,
-  co-authorship, reviews, or test attestations. Put trailers in the final block,
-  separated from the body by a blank line, and use Git's native trailer support.
+只保留可共享的工程事实，不复制原始聊天、内部推理记录、凭据或私密运维信息。
 
-Do not add `Agent`, `Agent-Context-Version`, model/session identifiers, or
-"prepared by" provenance by default. Executing `git commit` does not establish
-who authored the code. Follow an explicit user or repository metadata requirement
-without guessing unknown values. Do not introduce a parser, schema, or hook to
-enforce a body format.
+amend、squash、merge 时，结合原提交说明与最终改动，保留仍适用的背景和引用，去掉过时结论及重复过程；不得把旧代码的测试结果算作最终代码已验证，也不得扩大原有背书的适用范围。
 
-For amend, squash, or merge messages, inspect the relevant original messages and
-the final combined change. Preserve still-relevant constraints and rationale;
-remove superseded claims, duplicated explanations, and intermediate chronology.
-Do not present tests on an earlier tree as validation of the final tree. Preserve
-applicable references and standard attestations without broadening their scope.
+## 执行与交付
 
-## Deliver within the requested scope
+- 请求提交说明时只返回草稿，不改暂存区或创建提交。提交、改写历史、合并、推送须有相应授权；已有授权无需因使用技能再确认。
+- 执行提交时遵循仓库流程，只暂存授权文件或 hunk，核对最终暂存 diff 与说明一致。多行说明写入跟踪范围外的临时 UTF-8 文件，通过 `git commit -F` 使用并在结束后清理，避免 shell 插值；需要 trailers 时使用原生参数，避免重复。
+- 遵守 hook 和签名要求。失败时先检查结果，不绕过 hook 或盲目重试。成功后核对实际提交的说明与 diff，报告提交 ID、验证范围和剩余改动；推送需另有授权。
 
-A request for a message authorizes a draft, not a commit. An already-authorized
-commit does not require another approval just because this skill is active.
-The skill itself grants no permission to stage unrelated files, amend history,
-merge branches, push, publish, or change Git configuration.
+## 判断示例
 
-When committing is requested, follow repository Git instructions, stage only the
-authorized files or hunks, and recheck the final staged diff against the message.
-Write multiline text to a temporary UTF-8 file and use `git commit -F` with that
-file; use `--trailer` for any needed trailers without duplicating existing ones.
-Keep the temporary file outside the tracked change, avoid shell interpolation
-of message text, and remove it afterward. Respect hooks and signing requirements.
-After success, inspect the resulting commit message and diff, then report its ID
-and any remaining changes. Report failures accurately; do not bypass a failed
-hook or retry a potentially completed commit blindly. Push only when authorized.
+只知道超时从三秒改成五秒，可以只写“增加网关请求超时时间”。
 
-For a draft, return the message directly. Do not append an explanation of why the
-body is empty unless the user asks.
-
-## Examples
-
-Human changed a timeout from three to five seconds; no rationale was supplied:
+如果当前讨论还确认了上游耗时和客户端期限，则值得补充正文：
 
 ```text
-fix(gateway): increase request timeout
+增加网关请求超时时间
+
+上游支付服务在日结期间可能耗时三到四秒。五秒已是客户端请求期限，
+因此不能继续增大超时。
 ```
 
-The task explicitly established an upstream delay and a client deadline:
-
-```text
-fix(gateway): increase request timeout
-
-The upstream payment service can take 3–4 seconds during daily settlement.
-Five seconds is the client deadline, so the timeout must not increase further.
-```
-
-An established compatibility constraint and a known task reference:
-
-```text
-fix(auth): preserve the legacy expired-token response
-
-Clients before 3.12 interpret the new error code as a transport failure.
-Keep the old response until those client versions are retired.
-
-Task-Ref: GAME-1832
-```
-
-These facts and identifiers illustrate the format; never copy them into an
-unrelated commit. Adapt the wording and language to the actual evidence.
+示例中的事实只用于说明判断方式，不能套用到其他提交。
