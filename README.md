@@ -8,7 +8,10 @@
 <p align="center">
   <a href="#codex"><img src="https://img.shields.io/badge/Codex-plugin-18181B?style=flat-square" alt="Codex 插件" /></a>
   <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=flat-square" alt="Claude Code 插件" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-2563EB?style=flat-square" alt="MIT 许可证" /></a>
 </p>
+
+<p align="center"><strong>简体中文</strong> · <a href="README.en.md">English</a></p>
 
 <p align="center">
   <a href="#快速安装">快速安装</a> ·
@@ -209,3 +212,5 @@ codex plugin add commit-rationale@commit-rationale
 ---
 
 [查看场景与记录](benchmarks/handoffs.md) · [报告问题](https://github.com/SunneeYang/commit-rationale/issues)
+
+本项目采用 [MIT 许可证](LICENSE)。
