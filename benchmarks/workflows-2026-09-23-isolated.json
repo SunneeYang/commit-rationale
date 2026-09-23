@@ -1,0 +1,1313 @@
+{
+  "status": "completed",
+  "started_at": "2026-09-22T16:36:26.023434+00:00",
+  "runner": "codex-cli 0.155.1",
+  "evaluation_type": "synthetic_git_workflow_ablation",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "medium",
+  "protocol": "explicit-mcp-disable-v2",
+  "runs_per_condition_per_case": 1,
+  "guidance_loading": "explicit developer instructions; not automatic plugin routing",
+  "source_commit": "3e45e7531a07a996e253f70d485838dafa28a9ac",
+  "skill_sha256": "f5a1d88ad2e5edef9c7d1e3969b03686b3e1f542d529c71cd3ce361594858955",
+  "reader_sha256": "8ab3a5ef9f77578f2415be683a92f89c83af56525b3a369302e1618b8b9379d2",
+  "fixture_source_sha256": "47309a35d61fa6baa1305a6134f555a4f8cf812386110683a0e721c9186c0b99",
+  "cases": [
+    {
+      "id": "01-conversation",
+      "guidance": "skill",
+      "prompt": "帮我给暂存改动写提交说明，先不要提交。\n\n此前这次任务的对话记录：\n用户：客户说撤权之后还有人能看报表。附件里写的是撤权到失去访问最多十五分钟。\n助手：缓存是一小时，先改十二分钟留点余量？\n用户：先试一下。token 的期限别动，这次只处理权限缓存。\n助手：十二分钟那版的两个缓存单测过了，完整服务联调环境还没好。\n用户：刚跟对方又对过，最后统一十五分钟即可。这条约定以后也要遵守，不能为了命中率再往上调。\n助手：参数已改成十五分钟，完整联调还没跑，两个单测也没重跑。\n用户：日志里有个拼写先留着，别混进这次；上午讨论两轮有点慢。\n",
+      "oracle": "最终暂存改动仅将权限缓存60分钟改为15分钟。客户撤权最长15分钟的约定没有写入代码或文档。12分钟草案被放弃；token和日志未改。只对12分钟草案跑过两个单测，15分钟最终版未复测或联调。",
+      "checks": [
+        [
+          "constraint",
+          "context",
+          "正文保留客户撤权最长十五分钟的约定及未来不能仅为缓存命中率延长期限的限制。"
+        ],
+        [
+          "current",
+          "accuracy",
+          "描述最终15分钟方案，不把12分钟、token或日志说成本次最终改动。"
+        ],
+        [
+          "noise",
+          "concision",
+          "正文不复述60改15这一赋值变化，不写讨论轮次或试过十二分钟的开发经过；为限定旧测试范围而提十二分钟不扣分。"
+        ],
+        [
+          "tests",
+          "verification",
+          "不把草案的单测通过说成最终版已通过；如提验证，明确范围或未复测。"
+        ]
+      ]
+    },
+    {
+      "id": "02-merge",
+      "guidance": "skill",
+      "prompt": "刚合完 feature/export，请给当前这个 merge 拟一份提交说明。只输出说明，不修改提交。",
+      "oracle": "HEAD是普通双亲merge。仅本次源提交正文记录：仍在部署的Pine导入器2.4会把数值编号前导零丢掉，退役前要保持字符串；兼容性只检查本地旧导入器样本，没有验证所有发布包。第一父分支先前令牌30天的提交不在本次引入范围。最终代码仅改变编号序列化并处理空值，未记录以上外部约束。",
+      "checks": [
+        [
+          "constraint",
+          "context",
+          "新merge正文保留Pine旧导入器丢前导零以及其退役前维持字符串编号的约束，不要求复述具体版本号。"
+        ],
+        [
+          "scope",
+          "accuracy",
+          "不把目标分支已有的令牌30天背景或其他无关历史写进此次合并说明。"
+        ],
+        [
+          "noise",
+          "concision",
+          "正文不只是原样拼接源消息，不复述可见的字符串转换或空值占位符实现。提及字符串格式以解释兼容约束可接受。"
+        ],
+        [
+          "tests",
+          "verification",
+          "保留仅验证本地旧导入器样本、未覆盖全部发布包的范围，不声称合并后重新测试。"
+        ]
+      ]
+    },
+    {
+      "id": "03-amend",
+      "guidance": "skill",
+      "prompt": "这次补改准备 amend 到 HEAD，帮我重写提交说明，先不要执行。暂存的补改还没跑测试。",
+      "oracle": "HEAD原提交仅正文记录：合作方1.8及更早网关只识别legacyCode=17，新类型会被当成传输故障，旧网关退役前保留；原实现单测通过。暂存补改增加Retry-After。最终整体仍包含legacyCode和新响应头，补改后未测试。",
+      "checks": [
+        [
+          "constraint",
+          "context",
+          "保留合作方旧网关兼容原因及旧网关退役前保留错误码的条件，不能只围绕本次新增响应头。"
+        ],
+        [
+          "whole",
+          "accuracy",
+          "标题或整体说明覆盖旧网关兼容与Retry-After，不把原有功能描述为删除或新语义。"
+        ],
+        [
+          "noise",
+          "concision",
+          "正文保留原因而非罗列字段赋值和响应构造步骤，不添加开发流水账。为表达兼容约束提legacyCode=17可接受。"
+        ],
+        [
+          "tests",
+          "verification",
+          "不扩大原测试结论；明确最终版未复测或不声称它已测试通过。"
+        ]
+      ]
+    },
+    {
+      "id": "04-history-read",
+      "guidance": "reader",
+      "prompt": "请求偶尔超时，我想把当前两秒改成八秒。先帮我评估这个改动能不能做，别改文件。",
+      "oracle": "唯一的外部期限记录在历史提交正文：Orchid桌面端4.1固定在3秒截止，服务端用2秒给传输留余量。当前代码只存REQUEST_TIMEOUT=2，README指出调用方代码不在本仓库。没有证据说明4.1已退役或当前客户端期限已改变。应查历史后给条件性判断：不能只改成8秒，先核实客户端期限/覆盖范围。",
+      "checks": [
+        [
+          "history",
+          "context",
+          "指出历史记录中的客户端3秒截止及服务端留余量，表明使用了正文中的事实而不是仅据常量推测。"
+        ],
+        [
+          "decision",
+          "accuracy",
+          "不无条件建议将两秒直接提高到八秒，说明服务端改大不能解决调用方先截止的问题。"
+        ],
+        [
+          "current",
+          "verification",
+          "将历史期限作为待核实现状，说明需要确认当前客户端期限或旧版本退役情况；不能宣称所有现行客户端必然仍是3秒。"
+        ]
+      ]
+    },
+    {
+      "id": "05-documented",
+      "guidance": "skill",
+      "prompt": "策略和对应说明都已暂存，帮我写提交信息，先不要提交。",
+      "oracle": "diff把权限缓存改为15分钟，并在README同时新增客户撤权15分钟上限、不能为命中率延长的完整原因。没有额外背景、测试结果或未写入文档的限制。该案例用于检测正文重复最终diff中的文档。",
+      "checks": [
+        [
+          "title",
+          "accuracy",
+          "标题准确覆盖权限缓存期限及说明更新。无需逐项列文件。"
+        ],
+        [
+          "dedupe",
+          "concision",
+          "只保留简洁标题（允许代码块），不把diff里的README约束再写成正文。"
+        ],
+        [
+          "claims",
+          "verification",
+          "不编造测试通过、线上效果或未提供的外部条件。"
+        ]
+      ]
+    },
+    {
+      "id": "06-squash",
+      "guidance": "skill",
+      "prompt": "feature/dedupe 准备压成一条合到 main，先给我最终提交说明，不要执行合并。",
+      "oracle": "来源范围main..feature/dedupe。最初用分布式锁因为唯一索引尚未部署，后来删除锁改靠唯一键冲突；正文明确发布顺序：先部署唯一索引，再发布新服务。最终树没有锁。最后源提交记录单元测试通过、未验证跨区域并发。这些部署与验证事实未写进代码或README。",
+      "checks": [
+        [
+          "deployment",
+          "context",
+          "正文保留先部署唯一索引再发布新服务的外部发布前提。"
+        ],
+        [
+          "superseded",
+          "accuracy",
+          "正确描述最终唯一约束方案，不把已删除的锁或旧的索引缺失状态当成现行设计。"
+        ],
+        [
+          "noise",
+          "concision",
+          "不罗列先加锁后撤锁的开发经过，也不复述最终写数据库、冲突返回已有记录的实现步骤；为解释发布前提提锁可接受。"
+        ],
+        [
+          "tests",
+          "verification",
+          "保留源提交单元测试与未覆盖跨区域并发的边界，不扩大验证结论。"
+        ]
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "case": "01-conversation",
+      "condition": "baseline",
+      "initial_repository": {
+        "head": "c37f55a86887c31e686819b4fd4485b30d61568b",
+        "refs": "c37f55a86887c31e686819b4fd4485b30d61568b refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 4aae274dd0591cda41d34a3a4637d48c7d01cb1f 0\tcache.py\n",
+        "files": {
+          "cache.py": "d489d47e344cd2ea8b8614ee814a32edb440a6bb8fa1311470cc1faafb39268b",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "```text\n将权限缓存有效期从 60 分钟缩短至 15 分钟\n\n按客户最终约定，撤权到失去报表访问权限最多允许 15 分钟。\n权限缓存有效期后续不得为提高命中率而超过此上限。\n本次仅调整权限缓存，不改动 token 有效期。\n\n验证：此前 12 分钟版本的两个缓存单测已通过；\n调整为 15 分钟后尚未重跑，完整服务联调尚未执行。\n```",
+      "usage": {
+        "input_tokens": 27644,
+        "cached_input_tokens": 16000,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 243,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 18.39,
+      "tool_calls": 6,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -5 --format=%s'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "constraint",
+          "dimension": "context",
+          "id": "3/constraint",
+          "passed": true,
+          "reason": "保留客户十五分钟撤权约定及不得为命中率突破上限的限制。"
+        },
+        {
+          "key": "current",
+          "dimension": "accuracy",
+          "id": "3/current",
+          "passed": true,
+          "reason": "明确最终采用十五分钟，十二分钟仅用于限定旧测试范围。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "3/noise",
+          "passed": true,
+          "reason": "赋值变化仅出现在标题，正文未复述，也未记录开发经过。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "3/tests",
+          "passed": true,
+          "reason": "明确两个单测只覆盖十二分钟版本，最终版未重跑且未联调。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "01-conversation",
+      "condition": "guidance",
+      "initial_repository": {
+        "head": "c37f55a86887c31e686819b4fd4485b30d61568b",
+        "refs": "c37f55a86887c31e686819b4fd4485b30d61568b refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 4aae274dd0591cda41d34a3a4637d48c7d01cb1f 0\tcache.py\n",
+        "files": {
+          "cache.py": "d489d47e344cd2ea8b8614ee814a32edb440a6bb8fa1311470cc1faafb39268b",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "```text\n将权限缓存有效期缩短至十五分钟\n\n客户约定撤权后最多十五分钟内失去报表访问权限；这是后续必须遵守的上限，不能为了提高缓存命中率而延长。本次仅调整权限缓存，token 有效期保持不变。\n\n据此前任务记录，两个缓存单测仅在十二分钟版本通过；最终十五分钟版本尚未重跑，完整服务联调也未完成。\n```",
+      "usage": {
+        "input_tokens": 30080,
+        "cached_input_tokens": 17024,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 284,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 17.08,
+      "tool_calls": 7,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -5 --format=fuller'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc \"rg --files -g AGENTS.md -g '*CONTRIBUTING*' -g '*COMMIT*'\"",
+          "exit_code": 1
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "constraint",
+          "dimension": "context",
+          "id": "4/constraint",
+          "passed": true,
+          "reason": "明确十五分钟客户约定及未来不得为命中率延长的限制。"
+        },
+        {
+          "key": "current",
+          "dimension": "accuracy",
+          "id": "4/current",
+          "passed": true,
+          "reason": "描述最终十五分钟方案，并明确token未改。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "4/noise",
+          "passed": true,
+          "reason": "正文保留外部约束，十二分钟仅用于限定测试范围。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "4/tests",
+          "passed": true,
+          "reason": "区分草案单测通过与最终版未重跑、未完成联调。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "02-merge",
+      "condition": "guidance",
+      "initial_repository": {
+        "head": "204fe88847f2bba80972acf63716db83bb8e3a80",
+        "refs": "5ad76aaaa6b1a817cf08648dfcde5e088f79b6fd refs/heads/feature/export\n204fe88847f2bba80972acf63716db83bb8e3a80 refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 e21800190fed3323851711d1c6be066f5a8a2ea3 0\texport.py\n100644 23507f272eaacc051b0838b5301c1f8900064ddf 0\ttoken.py\n",
+        "files": {
+          "token.py": "2380b05dd97517e1545e050fe492652aaeac9f11e31caf020a53016c9e0ff759",
+          "export.py": "bbbc1fe68c02616a04e7718ef1a9e2227e02e5919a49344490f6959ac1b7c9e4",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "合并导出编号兼容性修复\n\n仍在部署的 Pine 导入器 2.4 会丢掉数值编号的前导零；这些版本退役前，导出编号必须继续使用字符串。\n\n源提交记录的兼容性检查仅覆盖本地旧导入器样本，未验证所有已发布导入器；合并后未重新验证。",
+      "usage": {
+        "input_tokens": 64590,
+        "cached_input_tokens": 46592,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 408,
+        "reasoning_output_tokens": 24
+      },
+      "elapsed_seconds": 26.04,
+      "tool_calls": 4,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'pwd; ls -a'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log HEAD''^1..HEAD''^2 --format=fuller; git diff HEAD''^1 HEAD; git ls-tree -r --name-only HEAD'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'cat README.md; git diff HEAD''^2 HEAD -- export.py; git log -3 HEAD''^1 --format='\"'%s%n%b'\"",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "constraint",
+          "dimension": "context",
+          "id": "2/constraint",
+          "passed": true,
+          "reason": "保留Pine丢失前导零的原因及退役前维持字符串的条件。"
+        },
+        {
+          "key": "scope",
+          "dimension": "accuracy",
+          "id": "2/scope",
+          "passed": true,
+          "reason": "未引入目标分支令牌期限等无关历史。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "2/noise",
+          "passed": true,
+          "reason": "正文集中说明兼容原因和验证范围，未复述转换及空值实现。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "2/tests",
+          "passed": true,
+          "reason": "明确仅检查本地旧导入器样本、未覆盖全部发布版本，未声称重新测试。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "02-merge",
+      "condition": "baseline",
+      "initial_repository": {
+        "head": "204fe88847f2bba80972acf63716db83bb8e3a80",
+        "refs": "5ad76aaaa6b1a817cf08648dfcde5e088f79b6fd refs/heads/feature/export\n204fe88847f2bba80972acf63716db83bb8e3a80 refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 e21800190fed3323851711d1c6be066f5a8a2ea3 0\texport.py\n100644 23507f272eaacc051b0838b5301c1f8900064ddf 0\ttoken.py\n",
+        "files": {
+          "token.py": "2380b05dd97517e1545e050fe492652aaeac9f11e31caf020a53016c9e0ff759",
+          "export.py": "bbbc1fe68c02616a04e7718ef1a9e2227e02e5919a49344490f6959ac1b7c9e4",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "合入 feature/export：保留导出编号格式并处理缺失值\n\n- 将非 None 编号转为字符串，保留字符串编号中的前导零。\n- 将 None 编号导出为 \"-\"，避免整数转换失败。",
+      "usage": {
+        "input_tokens": 27561,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 141,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 14.66,
+      "tool_calls": 1,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc \"git rev-parse --show-toplevel\n git status --short --branch\n git log -5 --format='%h %p %s'\n git show --format=fuller --stat HEAD\n git diff HEAD\"'^1 HEAD\n git diff --cached\n git diff\n git worktree list'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "constraint",
+          "dimension": "context",
+          "id": "10/constraint",
+          "passed": false,
+          "reason": "遗漏Pine旧导入器兼容原因及退役前保持字符串的条件。"
+        },
+        {
+          "key": "scope",
+          "dimension": "accuracy",
+          "id": "10/scope",
+          "passed": true,
+          "reason": "未引入令牌三十天等无关历史。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "10/noise",
+          "passed": false,
+          "reason": "正文仅复述字符串转换和空值占位符实现。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "10/tests",
+          "passed": false,
+          "reason": "遗漏仅验证本地旧导入器样本、未覆盖全部发布包的边界。"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "case": "03-amend",
+      "condition": "baseline",
+      "initial_repository": {
+        "head": "b7736a86eb9e7f0c610882b0ae61fbf6e66c11b7",
+        "refs": "b7736a86eb9e7f0c610882b0ae61fbf6e66c11b7 refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 1a0767f17c6c6822e2e4d7ee863a97141c08f6ec 0\tresponse.py\n",
+        "files": {
+          "response.py": "ed22ea3732ecc5f395774d70c83351da049fdaaedb66ff21b34cd9a055613f8e",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "```text\n兼容旧网关的限流响应并补充重试提示\n\n在 429 限流响应中保留 legacyCode=17。合作方仍运行的 1.8 及更早\n网关只识别该错误码，会将新的错误类型当作传输故障，因此旧网关\n退役前需保持兼容。\n\n补充 Retry-After: 5 响应头，提示客户端在 5 秒后重试。\n\n原实现的单元测试已通过；本次补充 Retry-After 的暂存改动尚未运行\n测试，合并后的版本尚未验证。\n```",
+      "usage": {
+        "input_tokens": 42726,
+        "cached_input_tokens": 36096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 329,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 23.86,
+      "tool_calls": 8,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -5 --format=fuller'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git show --stat --oneline HEAD'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git show --format= --no-ext-diff HEAD -- response.py'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "constraint",
+          "dimension": "context",
+          "id": "9/constraint",
+          "passed": true,
+          "reason": "保留旧网关仅识别旧码、误判新类型及退役前兼容的条件。"
+        },
+        {
+          "key": "whole",
+          "dimension": "accuracy",
+          "id": "9/whole",
+          "passed": true,
+          "reason": "标题和正文共同覆盖旧网关兼容及Retry-After重试提示。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "9/noise",
+          "passed": false,
+          "reason": "正文额外罗列Retry-After: 5的字段赋值及重试行为。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "9/tests",
+          "passed": true,
+          "reason": "区分原实现单测通过与新增响应头后的完整版本未验证。"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "case": "03-amend",
+      "condition": "guidance",
+      "initial_repository": {
+        "head": "b7736a86eb9e7f0c610882b0ae61fbf6e66c11b7",
+        "refs": "b7736a86eb9e7f0c610882b0ae61fbf6e66c11b7 refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 1a0767f17c6c6822e2e4d7ee863a97141c08f6ec 0\tresponse.py\n",
+        "files": {
+          "response.py": "ed22ea3732ecc5f395774d70c83351da049fdaaedb66ff21b34cd9a055613f8e",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "```text\n兼容旧网关限流响应并添加重试提示\n\n合作方仍运行的 1.8 及更早网关只识别 legacyCode=17，会将新的错误类型当作传输故障。旧网关退役前需要保留旧错误码。\n\n原提交记录其实现的单元测试已通过；本次新增 Retry-After 的暂存补改尚未运行测试，该结果不覆盖修订后的完整实现。\n```",
+      "usage": {
+        "input_tokens": 62670,
+        "cached_input_tokens": 48640,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 361,
+        "reasoning_output_tokens": 8
+      },
+      "elapsed_seconds": 24.53,
+      "tool_calls": 10,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -5 --format=fuller'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc \"rg --files -g AGENTS.md -g '*CONTRIBUTING*' -g '*commit*'\"",
+          "exit_code": 1
+        },
+        {
+          "command": "/bin/zsh -lc 'git ls-files'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached HEAD''^ --'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'cat README.md'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "constraint",
+          "dimension": "context",
+          "id": "11/constraint",
+          "passed": true,
+          "reason": "完整保留旧网关识别限制、误判原因及退役前保留旧码的条件。"
+        },
+        {
+          "key": "whole",
+          "dimension": "accuracy",
+          "id": "11/whole",
+          "passed": true,
+          "reason": "标题涵盖旧网关兼容和重试提示，正文明确新增Retry-After。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "11/noise",
+          "passed": true,
+          "reason": "正文聚焦兼容原因及测试边界，未罗列字段赋值或构造步骤。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "11/tests",
+          "passed": true,
+          "reason": "明确原提交测试结果不覆盖尚未测试的完整修订实现。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "04-history-read",
+      "condition": "guidance",
+      "initial_repository": {
+        "head": "d72c15cb3b83995381463e74d4600b3bb4509e22",
+        "refs": "d72c15cb3b83995381463e74d4600b3bb4509e22 refs/heads/main\n",
+        "index": "100644 bda3f71d0f06225af4de7f0960aa7758cbf3b2ce 0\tREADME.md\n100644 d44b4bc3edcee806542a26af56cd91f5718e9d3f 0\tclient.py\n100644 7dd511683bc85b8cb7d31982e55a6d1a06f814f9 0\thealth.py\n",
+        "files": {
+          "health.py": "2267db3e0ff1c53c27fb7246376bab9188ab49455dce7ce18bfd8bc1b7b4e5f5",
+          "client.py": "e514f8c563fb75559a2db90427b62f295bd9e81231a50095fae3f9501768eca9",
+          "README.md": "6961a9f01d8a0e000a3e091e8a73c2032e88d089f1b357deed94c59a5e58234f"
+        }
+      },
+      "output": "**代码上能改，但不建议直接把两秒改成八秒。**\n\n- 当前 `client.py:1` 的两秒用于下游请求。\n- 提交 `100afb6` 的完整说明记录：**Orchid 桌面端 4.1 固定在三秒截止，服务端设为两秒是给传输留余量。**\n- 如果该限制仍存在，服务端等待八秒，客户端仍会在三秒结束等待；这无法解决客户端超时，还可能延长服务端资源占用。\n\n上游客户端代码不在本仓库，因此无法确认目前是否仍有三秒限制。建议先确认实际客户端版本和截止时间；若要支持八秒下游请求，需要同步调整整条调用链的超时预算，并预留传输时间。\n\n未修改文件，未运行测试。",
+      "usage": {
+        "input_tokens": 56955,
+        "cached_input_tokens": 44032,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 443,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 32.96,
+      "tool_calls": 4,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc \"git status --short --branch; git diff; git diff --cached; git worktree list; rg --files -g '\"'!vendor'\"' -g '\"'!node_modules'\"'\"",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -8 --oneline; nl -ba client.py; nl -ba health.py; cat README.md'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git --no-pager show -s --format=%B 100afb6; git --no-pager show 100afb6 -- client.py; git --no-pager show -s --format=%B a8a1283; git --no-pager show -s --format=%B d72c15c'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "history",
+          "dimension": "context",
+          "id": "5/history",
+          "passed": true,
+          "reason": "引用历史说明中的Orchid三秒截止及服务端预留传输余量。"
+        },
+        {
+          "key": "decision",
+          "dimension": "accuracy",
+          "id": "5/decision",
+          "passed": true,
+          "reason": "反对直接改八秒，并解释调用方可能仍在三秒截止。"
+        },
+        {
+          "key": "current",
+          "dimension": "verification",
+          "id": "5/current",
+          "passed": true,
+          "reason": "以条件句讨论历史限制，明确需核实当前版本和截止时间。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "04-history-read",
+      "condition": "baseline",
+      "initial_repository": {
+        "head": "d72c15cb3b83995381463e74d4600b3bb4509e22",
+        "refs": "d72c15cb3b83995381463e74d4600b3bb4509e22 refs/heads/main\n",
+        "index": "100644 bda3f71d0f06225af4de7f0960aa7758cbf3b2ce 0\tREADME.md\n100644 d44b4bc3edcee806542a26af56cd91f5718e9d3f 0\tclient.py\n100644 7dd511683bc85b8cb7d31982e55a6d1a06f814f9 0\thealth.py\n",
+        "files": {
+          "health.py": "2267db3e0ff1c53c27fb7246376bab9188ab49455dce7ce18bfd8bc1b7b4e5f5",
+          "client.py": "e514f8c563fb75559a2db90427b62f295bd9e81231a50095fae3f9501768eca9",
+          "README.md": "6961a9f01d8a0e000a3e091e8a73c2032e88d089f1b357deed94c59a5e58234f"
+        }
+      },
+      "output": "代码上可以改，但**不建议单独把两秒改成八秒**，这未必能解决用户看到的超时。\n\n- `client.py:1` 的两秒用于下游请求。\n- 本地提交 `100afb6` 明确说明：**Orchid 桌面端 4.1 固定在三秒截止**，服务端设为两秒是为了给传输留余量。只增加服务端超时，客户端不会等待更久，还可能增加无效等待和资源占用。\n- README 说明上游客户端代码不在本仓库，因此无法在这里确认当前客户端是否已放宽限制。\n\n建议先确认受影响客户端的截止时间；若仍为三秒，应保留两秒并排查下游慢请求。要支持八秒下游等待，需要同步放宽客户端及中间链路的超时，并预留传输时间。\n\n未修改文件。",
+      "usage": {
+        "input_tokens": 42742,
+        "cached_input_tokens": 30080,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 499,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 24.8,
+      "tool_calls": 9,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -8 --oneline'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc \"rg --files -g '\"'!go.sum'\"' -g '\"'!package-lock.json'\"'\"",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'nl -ba client.py; nl -ba README.md; nl -ba health.py'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -p --all -- client.py README.md'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "history",
+          "dimension": "context",
+          "id": "6/history",
+          "passed": true,
+          "reason": "明确引用历史提交中的三秒客户端期限及两秒留余量原因。"
+        },
+        {
+          "key": "decision",
+          "dimension": "accuracy",
+          "id": "6/decision",
+          "passed": true,
+          "reason": "不建议单独改八秒，说明服务端延时不会增加客户端等待期限。"
+        },
+        {
+          "key": "current",
+          "dimension": "verification",
+          "id": "6/current",
+          "passed": true,
+          "reason": "明确无法确认当前限制，并要求先核实受影响客户端期限。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "05-documented",
+      "condition": "baseline",
+      "initial_repository": {
+        "head": "c37f55a86887c31e686819b4fd4485b30d61568b",
+        "refs": "c37f55a86887c31e686819b4fd4485b30d61568b refs/heads/main\n",
+        "index": "100644 828322b64a3b8e2e57d9c11e14b658edd85cab59 0\tREADME.md\n100644 4aae274dd0591cda41d34a3a4637d48c7d01cb1f 0\tcache.py\n",
+        "files": {
+          "cache.py": "d489d47e344cd2ea8b8614ee814a32edb440a6bb8fa1311470cc1faafb39268b",
+          "README.md": "dd052bfedf36243b77c38e34f5a7dbd741e88261ea8341a128f5e902022855df"
+        }
+      },
+      "output": "```text\n将权限缓存有效期缩短至十五分钟\n\n将权限缓存有效期从 60 分钟调整为 15 分钟，以满足客户撤权后最多十五分钟内失去访问能力的要求。\n在 README 中明确该上限，禁止仅为提高缓存命中率而延长有效期。\n```",
+      "usage": {
+        "input_tokens": 27450,
+        "cached_input_tokens": 15872,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 237,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 15.84,
+      "tool_calls": 6,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -5 --format=%s'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "title",
+          "dimension": "accuracy",
+          "id": "1/title",
+          "passed": false,
+          "reason": "标题仅描述缓存期限调整，未覆盖说明更新。"
+        },
+        {
+          "key": "dedupe",
+          "dimension": "concision",
+          "id": "1/dedupe",
+          "passed": false,
+          "reason": "正文重复README中的撤权上限及不得为命中率延期的约束。"
+        },
+        {
+          "key": "claims",
+          "dimension": "verification",
+          "id": "1/claims",
+          "passed": true,
+          "reason": "未编造测试通过、线上效果或额外外部条件。"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "case": "05-documented",
+      "condition": "guidance",
+      "initial_repository": {
+        "head": "c37f55a86887c31e686819b4fd4485b30d61568b",
+        "refs": "c37f55a86887c31e686819b4fd4485b30d61568b refs/heads/main\n",
+        "index": "100644 828322b64a3b8e2e57d9c11e14b658edd85cab59 0\tREADME.md\n100644 4aae274dd0591cda41d34a3a4637d48c7d01cb1f 0\tcache.py\n",
+        "files": {
+          "cache.py": "d489d47e344cd2ea8b8614ee814a32edb440a6bb8fa1311470cc1faafb39268b",
+          "README.md": "dd052bfedf36243b77c38e34f5a7dbd741e88261ea8341a128f5e902022855df"
+        }
+      },
+      "output": "将权限缓存有效期缩短至十五分钟并记录撤权时限要求",
+      "usage": {
+        "input_tokens": 29580,
+        "cached_input_tokens": 16768,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 192,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 14.67,
+      "tool_calls": 7,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -5 --format=fuller'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc \"rg --files -g AGENTS.md -g '*CONTRIBUT*' -g '*commit*' -g README.md\"",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "title",
+          "dimension": "accuracy",
+          "id": "0/title",
+          "passed": true,
+          "reason": "标题同时涵盖十五分钟期限和撤权时限说明更新。"
+        },
+        {
+          "key": "dedupe",
+          "dimension": "concision",
+          "id": "0/dedupe",
+          "passed": true,
+          "reason": "仅有简洁标题，未重复README正文。"
+        },
+        {
+          "key": "claims",
+          "dimension": "verification",
+          "id": "0/claims",
+          "passed": true,
+          "reason": "未声称测试、线上效果或额外外部条件。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "06-squash",
+      "condition": "guidance",
+      "initial_repository": {
+        "head": "aa57f5d1bc910a01df00e981779aa9a0cdd7a5a6",
+        "refs": "aa57f5d1bc910a01df00e981779aa9a0cdd7a5a6 refs/heads/feature/dedupe\n2499be25fc346e96549c7fcf538fbc0e22f8c8f0 refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 b2881c34eeaed355e738abb63e4a897e1aa715e1 0\tcreate.py\n",
+        "files": {
+          "create.py": "6cfed6e903e3e5c57ccf48bd3754337a01eac165e255c35fd18d63338fc87e62",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "```text\n使用唯一约束处理重复创建\n\n发布时必须先部署数据库唯一索引，再发布新服务；该顺序是创建流程无需分布式锁的前提。\n\n原分支提交记录单元测试通过，尚未验证跨区域并发创建；本次未重新运行测试。\n```",
+      "usage": {
+        "input_tokens": 64668,
+        "cached_input_tokens": 49664,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 404,
+        "reasoning_output_tokens": 8
+      },
+      "elapsed_seconds": 28.74,
+      "tool_calls": 13,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -6 --format=fuller'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc \"rg --files -g AGENTS.md -g '*CONTRIBUT*' -g '*commit*' -g '*COMMIT*'\"",
+          "exit_code": 1
+        },
+        {
+          "command": "/bin/zsh -lc \"rg --files --hidden -g '\"'!.git'\"' \"",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff main feature/dedupe'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log main..feature/dedupe --format=fuller'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log -4 main --format=%B'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git merge-base main feature/dedupe'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'cat README.md'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "deployment",
+          "dimension": "context",
+          "id": "7/deployment",
+          "passed": true,
+          "reason": "明确要求先部署唯一索引，再发布新服务。"
+        },
+        {
+          "key": "superseded",
+          "dimension": "accuracy",
+          "id": "7/superseded",
+          "passed": true,
+          "reason": "描述最终唯一约束方案，未将分布式锁当作现行设计。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "7/noise",
+          "passed": true,
+          "reason": "提锁仅为解释发布前提，未罗列开发经过或实现步骤。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "7/tests",
+          "passed": true,
+          "reason": "保留源提交单测通过和跨区域并发未验证的边界。"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "06-squash",
+      "condition": "baseline",
+      "initial_repository": {
+        "head": "aa57f5d1bc910a01df00e981779aa9a0cdd7a5a6",
+        "refs": "aa57f5d1bc910a01df00e981779aa9a0cdd7a5a6 refs/heads/feature/dedupe\n2499be25fc346e96549c7fcf538fbc0e22f8c8f0 refs/heads/main\n",
+        "index": "100644 19305b1ea1678b16ce560987ed0c9db6cb52670a 0\tREADME.md\n100644 b2881c34eeaed355e738abb63e4a897e1aa715e1 0\tcreate.py\n",
+        "files": {
+          "create.py": "6cfed6e903e3e5c57ccf48bd3754337a01eac165e255c35fd18d63338fc87e62",
+          "README.md": "d3cb0e1704bc8b21bf8618e0f939c6ca907396972bc3e35b99c5c5e3121ad460"
+        }
+      },
+      "output": "```text\n使用数据库唯一约束处理重复创建\n\n创建时捕获唯一约束冲突，并返回已有记录，避免重复创建。\n\n发布时须先部署唯一索引，再发布新服务。\n按已有测试记录，单元测试通过；尚未验证跨区域并发创建。\n```",
+      "usage": {
+        "input_tokens": 42937,
+        "cached_input_tokens": 35712,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 314,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 24.02,
+      "tool_calls": 10,
+      "commands": [
+        {
+          "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git status --short --branch'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff --cached'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git worktree list'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log --oneline --decorate -12 --all'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log --format=fuller main..feature/dedupe'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git ls-tree -r --name-only HEAD'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git log --oneline --graph --all --parents'",
+          "exit_code": 0
+        },
+        {
+          "command": "/bin/zsh -lc 'git diff main...feature/dedupe'",
+          "exit_code": 0
+        }
+      ],
+      "item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "checks": [
+        {
+          "key": "deployment",
+          "dimension": "context",
+          "id": "8/deployment",
+          "passed": true,
+          "reason": "保留先部署唯一索引再发布服务的顺序。"
+        },
+        {
+          "key": "superseded",
+          "dimension": "accuracy",
+          "id": "8/superseded",
+          "passed": true,
+          "reason": "正确描述依靠唯一约束处理重复创建的最终方案。"
+        },
+        {
+          "key": "noise",
+          "dimension": "concision",
+          "id": "8/noise",
+          "passed": false,
+          "reason": "正文复述捕获唯一约束冲突并返回已有记录的实现步骤。"
+        },
+        {
+          "key": "tests",
+          "dimension": "verification",
+          "id": "8/tests",
+          "passed": true,
+          "reason": "将单测通过归于已有记录，并明确未验证跨区域并发。"
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "scores": {
+    "baseline": {
+      "cases_passed": 2,
+      "cases_total": 6,
+      "dimensions": {
+        "accuracy": {
+          "passed": 5,
+          "total": 6
+        },
+        "concision": {
+          "passed": 1,
+          "total": 5
+        },
+        "context": {
+          "passed": 4,
+          "total": 5
+        },
+        "verification": {
+          "passed": 5,
+          "total": 6
+        }
+      }
+    },
+    "guidance": {
+      "cases_passed": 6,
+      "cases_total": 6,
+      "dimensions": {
+        "accuracy": {
+          "passed": 6,
+          "total": 6
+        },
+        "concision": {
+          "passed": 5,
+          "total": 5
+        },
+        "context": {
+          "passed": 5,
+          "total": 5
+        },
+        "verification": {
+          "passed": 6,
+          "total": 6
+        }
+      }
+    }
+  },
+  "runner_source_sha256": {
+    "run_codex.py": "42f97813c01303f9eb6fdd696e54150c5ba371f6dcc0b18c30f1c5e622d01cdd",
+    "run_workflows.py": "c18fdb215427184b659a123d53fc279158c0ac7bcb3ab06b62aaa1498acd33bf"
+  },
+  "isolation_probe": {
+    "skill": [
+      {
+        "requested_model": "gpt-6-astra",
+        "guidance_present": false,
+        "reader_hook_present": false,
+        "ponytail_present": false,
+        "tool_names": [],
+        "condition": "without_rules"
+      },
+      {
+        "requested_model": "gpt-6-astra",
+        "guidance_present": true,
+        "reader_hook_present": false,
+        "ponytail_present": false,
+        "tool_names": [],
+        "condition": "with_rules"
+      }
+    ],
+    "reader": [
+      {
+        "requested_model": "gpt-6-astra",
+        "guidance_present": false,
+        "reader_hook_present": false,
+        "ponytail_present": false,
+        "tool_names": [],
+        "condition": "without_rules"
+      },
+      {
+        "requested_model": "gpt-6-astra",
+        "guidance_present": true,
+        "reader_hook_present": true,
+        "ponytail_present": false,
+        "tool_names": [],
+        "condition": "with_rules"
+      }
+    ]
+  },
+  "judge": {
+    "model": "gpt-6-astra",
+    "condition_labels_hidden": true,
+    "same_model_as_generator": true,
+    "usage": {
+      "input_tokens": 16556,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1489,
+      "reasoning_output_tokens": 144
+    }
+  }
+}

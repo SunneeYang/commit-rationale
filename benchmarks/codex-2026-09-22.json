@@ -1,0 +1,323 @@
+{
+  "status": "completed",
+  "started_at": "2026-09-22T15:46:36.986708+00:00",
+  "runner": "codex-cli 0.155.1",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "medium",
+  "runs_per_condition_per_case": 1,
+  "evaluation_type": "closed_book_rule_text_ablation",
+  "skill_sha256": "f5a1d88ad2e5edef9c7d1e3969b03686b3e1f542d529c71cd3ce361594858955",
+  "source_commit": "3e45e7531a07a996e253f70d485838dafa28a9ac",
+  "cases": [
+    {
+      "id": "01-title-only",
+      "prompt": "根据以下全部已知信息，生成一条 Git 提交说明。只返回提交说明，可以使用代码块；不要执行提交或改动文件。无需查询仓库，以下材料完整。\n\n仓库使用简短中文标题，没有强制正文格式。\n本次 diff：\n```diff\n-const defaultPageSize = 20;\n+const defaultPageSize = 30;\n```\n没有提供业务动机、兼容性约束或验证结果。",
+      "criteria": "输出应是与分页大小改动一致的单行标题（允许外层代码块）。不添加正文、解释、清单或选择理由；不编造性能收益、用户反馈、业务动机或已通过的测试。",
+      "prompt_sha256": "b042cf80962fd0c2679e200f38534ef56417011579680e99f9a72fcd61c81326",
+      "criteria_sha256": "22694bf3ac8f415dedd9c8340f5e984688e0ce9b2e65070a041cc49060611a93"
+    },
+    {
+      "id": "02-low-value-history",
+      "prompt": "根据以下全部已知信息，生成一条 Git 提交说明。只返回提交说明，可以使用代码块；不要执行提交或改动文件。无需查询仓库，以下材料完整。\n\n仓库使用简短中文标题，没有强制正文格式。\n本次 diff：\n```diff\n-logger.info(\"Cache udpated\");\n+logger.info(\"Cache updated\");\n```\n任务背景：用户在联调时发现了拼写错误。我们讨论了两次后决定修复；修改花了五分钟。没有行为变化，也没有其他约束或验证结果。",
+      "criteria": "用单行标题准确说明修正日志拼写（允许外层代码块）。不把联调发现、讨论次数、耗时等经过写成正文；不宣称性能或功能改善，不编造测试结果。",
+      "prompt_sha256": "96ca19b9408cff9ad85329a52057d3f2b3e9740c17584ea6a724e594a235606c",
+      "criteria_sha256": "ad41a654d0eb4ef119fd568904da36cde333597e655b0b8ff97a71c2b510582a"
+    },
+    {
+      "id": "03-external-constraint",
+      "prompt": "根据以下全部已知信息，生成一条 Git 提交说明。只返回提交说明，可以使用代码块；不要执行提交或改动文件。无需查询仓库，以下材料完整。\n\n仓库使用简短中文标题，没有强制正文格式。\n本次 diff：\n```diff\n-const permissionCacheTTL = 60 * time.Minute;\n+const permissionCacheTTL = 15 * time.Minute;\n```\n已确认的外部约束：合作方的权限撤销协议要求用户在撤权后最多十五分钟内失去访问能力。这个期限是约定的兼容边界，后续不能仅为提高缓存命中率延长 TTL。以上原因没有写入代码或项目文档。尚未运行任何测试。",
+      "criteria": "标题准确说明缩短权限缓存期限。正文保留合作方撤权最长十五分钟的外部约束，以及未来不能仅为缓存收益延长期限的含义；可以合并成一句。不能只有“从六十分钟改成十五分钟”的 diff 复述；不得编造测试通过、线上收益或安全保证。",
+      "prompt_sha256": "1f575377dae12a3d8ec1c95b296ca87193bbe6ed2f84cd285486504fa9073ca9",
+      "criteria_sha256": "f9582e1b612865947ba76af856d537845cf399016723c772be82c85bf13be018"
+    },
+    {
+      "id": "04-merge-context",
+      "prompt": "根据以下资料，为一次普通双亲 merge 生成新的 Git 提交说明。只返回提交说明，可以使用代码块；不要执行 Git 操作。原始提交会完整保留，但这条 merge 记录会成为维护者的首要阅读入口。以下材料完整。\n\n本次只新引入两个源提交：\nA 标题：保留导出记录的字符串编号\nA 正文：仍在使用的旧导入器会丢掉数值编号的前导零，因此导出编号必须继续作为字符串，直到这些导入器退役。\nB 标题：为空白编号补上占位符\nB 正文：兼容性检查只覆盖本地旧导入器样本，没有验证所有已发布导入器。\n\n最终 diff 相对第一父提交：保留字符串序列化并新增空编号占位符分支。没有冲突，也没有新增集成决策。代码和文档没有解释旧导入器的行为或验证范围。没有合并后新增的测试结果。\n仓库使用简短中文标题，没有强制正文格式。",
+      "criteria": "生成 merge 的新标题及能独立理解的精简正文。正文保留旧导入器会丢掉前导零、字符串编号要保留到旧导入器退役的约束，并保留兼容性只检查本地样本、未覆盖所有发布版本的边界。不能因原提交仍存在、合并无冲突或没有新增决策而省略这些背景；不能声称合并后测试已通过。",
+      "prompt_sha256": "47022f03419c9e8dd6c57ebd7215cc1bb71b20f98f9405a57286861dae7d5ead",
+      "criteria_sha256": "ba041555fbefb917a41cccb7534beebe797291f373998c1031acb180d84221a5"
+    },
+    {
+      "id": "05-squash-context",
+      "prompt": "根据以下资料，为三个提交 squash 后的最终改动生成一条 Git 提交说明。只返回提交说明，可以使用代码块；不要执行 Git 操作。以下材料完整。\n\n源提交 A：暂用分布式锁防止重复创建。正文说明当时数据库唯一索引尚未部署，锁只是临时措施。\n源提交 B：改用数据库唯一约束处理重复创建。正文说明已确定发布顺序：先部署唯一索引，再发布新服务。因此最终删除临时分布式锁；这条部署前提没有写在代码和文档里。\n源提交 C：补充创建流程单测。正文说明单元测试通过，但未验证跨区域并发创建。\n\n最终 diff 相对 squash 基线：创建时写数据库，唯一键冲突返回已有记录，增加单元测试；最终不存在分布式锁。没有其他验证结果。\n仓库使用简短中文标题，没有强制正文格式。",
+      "criteria": "标题描述最终基于唯一约束防止重复创建的行为。正文保留必须先部署唯一索引再发布服务的前提，以及验证仅为单元测试、未覆盖跨区域并发的边界。不得仍把分布式锁说成当前方案，不罗列 A/B/C 开发过程，不声称已完成跨区域并发验证。",
+      "prompt_sha256": "3ff7170aa414eec1bc3702eab58ca9ed5bd0179031828462bc87217d1b6f3a00",
+      "criteria_sha256": "12a77c174c22386a4441ed8de462a293f60c7dd201fb4989d361b27f466cbb1a"
+    },
+    {
+      "id": "06-amend-context",
+      "prompt": "根据以下资料，为 amend 后的最终改动重写 Git 提交说明。只返回提交说明，可以使用代码块；不要执行 Git 操作。以下材料完整。\n\n原提交标题：兼容旧网关的限流响应\n原提交正文：合作方仍运行的 1.8 及更早网关只识别 legacyCode=17；新的错误类型会被当作传输故障。需要保留旧错误码直到这些网关退役。原实现对应的单元测试已通过。\n原 diff：限流响应加入 legacyCode=17。\n\n这次新增暂存 diff：同一个限流响应增加 Retry-After 响应头。\n修订后的整体相对原父提交：同时保留 legacyCode=17 和 Retry-After。\n补改后的整体未重新测试。代码和文档未记录合作方网关兼容性原因。\n仓库使用简短中文标题，没有强制正文格式。",
+      "criteria": "标题和正文覆盖 amend 后的整体，不能只写新加 Retry-After。正文保留合作方旧网关只识别 legacyCode=17、误判新错误类型及旧网关退役前保留兼容性的含义。不能把原实现的测试通过写成修订后整体已经验证；应明确补改未复测，或不宣称最终版本测试通过。",
+      "prompt_sha256": "5faf480b40b900df3de2c207d28a2db8967e3ffe2f8a0e94a40c738cb573b803",
+      "criteria_sha256": "647e437180d9a873206dfe8305790d5d1b5561bb9cc9c5f0a606e4d876277b3e"
+    }
+  ],
+  "runs": [
+    {
+      "case": "01-title-only",
+      "condition": "without_rules",
+      "output": "将默认分页大小从 20 调整为 30",
+      "usage": {
+        "input_tokens": 13300,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 16,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 9.05,
+      "tool_calls": 0,
+      "grade": {
+        "id": "7",
+        "passed": true,
+        "reason": "单行标题准确描述分页大小由 20 调整为 30，无额外正文或虚构信息。"
+      }
+    },
+    {
+      "case": "01-title-only",
+      "condition": "with_rules",
+      "output": "将默认分页大小调整为 30",
+      "usage": {
+        "input_tokens": 14381,
+        "cached_input_tokens": 8832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 12,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 9.14,
+      "tool_calls": 0,
+      "grade": {
+        "id": "8",
+        "passed": true,
+        "reason": "单行标题准确说明默认分页大小调整为 30，未添加动机、收益或测试声明。"
+      }
+    },
+    {
+      "case": "02-low-value-history",
+      "condition": "with_rules",
+      "output": "修正缓存更新日志中的拼写错误",
+      "usage": {
+        "input_tokens": 14405,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 13,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 7.31,
+      "tool_calls": 0,
+      "grade": {
+        "id": "0",
+        "passed": true,
+        "reason": "单行标题准确说明日志拼写修正，未添加过程或虚构收益、测试结果。"
+      }
+    },
+    {
+      "case": "02-low-value-history",
+      "condition": "without_rules",
+      "output": "修正缓存更新日志中的拼写错误",
+      "usage": {
+        "input_tokens": 13324,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 13,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 7.43,
+      "tool_calls": 0,
+      "grade": {
+        "id": "2",
+        "passed": true,
+        "reason": "单行标题准确说明日志拼写修正，无无关正文或未经证实的声明。"
+      }
+    },
+    {
+      "case": "03-external-constraint",
+      "condition": "without_rules",
+      "output": "缩短权限缓存有效期至十五分钟\n\n将 TTL 从六十分钟缩短至十五分钟，满足合作方要求撤权后最多十五分钟内失去访问能力的协议约束。该期限是兼容边界，后续不得仅为提高缓存命中率而延长。\n\n尚未运行测试。",
+      "usage": {
+        "input_tokens": 13363,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 73,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 8.52,
+      "tool_calls": 0,
+      "grade": {
+        "id": "6",
+        "passed": true,
+        "reason": "准确说明缩短缓存期限，保留十五分钟撤权协议及不得仅为缓存收益延长的约束，测试状态符合材料。"
+      }
+    },
+    {
+      "case": "03-external-constraint",
+      "condition": "with_rules",
+      "output": "将权限缓存有效期缩短至十五分钟\n\n合作方权限撤销协议要求用户在撤权后最多十五分钟内失去访问能力。该期限是约定的兼容边界，不能仅为提高缓存命中率而延长 TTL。\n\n尚未运行测试。",
+      "usage": {
+        "input_tokens": 14444,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 65,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 9.15,
+      "tool_calls": 0,
+      "grade": {
+        "id": "9",
+        "passed": true,
+        "reason": "标题准确，正文完整保留外部撤权期限和未来调整限制，并如实说明未运行测试。"
+      }
+    },
+    {
+      "case": "04-merge-context",
+      "condition": "with_rules",
+      "output": "合并导出编号兼容性处理\n\n仍在使用的旧导入器会丢掉数值编号的前导零，因此在这些导入器退役前，导出编号必须保持为字符串。\n\n兼容性检查仅覆盖本地旧导入器样本，未验证所有已发布导入器；合并后未新增测试验证。",
+      "usage": {
+        "input_tokens": 14520,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 83,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 8.65,
+      "tool_calls": 0,
+      "grade": {
+        "id": "4",
+        "passed": true,
+        "reason": "新标题和正文可独立理解，保留旧导入器前导零问题、退役前兼容约束及本地样本验证边界。"
+      }
+    },
+    {
+      "case": "04-merge-context",
+      "condition": "without_rules",
+      "output": "保留导出字符串编号并为空编号补上占位符\n\n仍在使用的旧导入器会丢掉数值编号的前导零，因此导出编号继续按字符串序列化，直到这些导入器退役；空编号使用占位符。\n\n兼容性检查仅覆盖本地旧导入器样本，未验证所有已发布导入器。合并后没有新增测试结果。",
+      "usage": {
+        "input_tokens": 13439,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 96,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 11.42,
+      "tool_calls": 0,
+      "grade": {
+        "id": "5",
+        "passed": true,
+        "reason": "覆盖字符串编号及空编号占位符，完整保留兼容原因、期限和验证边界，未虚构测试结果。"
+      }
+    },
+    {
+      "case": "05-squash-context",
+      "condition": "without_rules",
+      "output": "通过数据库唯一约束避免重复创建\n\n创建时直接写入数据库，唯一键冲突时返回已有记录，移除临时分布式锁。\n\n部署时必须先部署唯一索引，再发布新服务。\n\n补充创建流程单元测试，单测通过；尚未验证跨区域并发创建。",
+      "usage": {
+        "input_tokens": 13408,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 72,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 9.22,
+      "tool_calls": 0,
+      "grade": {
+        "id": "1",
+        "passed": true,
+        "reason": "描述最终唯一约束方案，保留部署顺序及单测、跨区域验证边界，未将分布式锁作为当前方案。"
+      }
+    },
+    {
+      "case": "05-squash-context",
+      "condition": "with_rules",
+      "output": "使用数据库唯一约束处理重复创建\n\n发布时必须先部署唯一索引，再发布新服务；移除临时分布式锁依赖此前提。\n\n单元测试通过，尚未验证跨区域并发创建。",
+      "usage": {
+        "input_tokens": 14489,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 53,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 8.71,
+      "tool_calls": 0,
+      "grade": {
+        "id": "3",
+        "passed": true,
+        "reason": "标题准确描述最终方案，正文保留唯一索引先部署的前提及验证范围限制。"
+      }
+    },
+    {
+      "case": "06-amend-context",
+      "condition": "with_rules",
+      "output": "兼容旧网关限流响应并添加 Retry-After\n\n合作方仍运行的 1.8 及更早网关只识别 legacyCode=17，会将新的错误类型当作传输故障，因此需保留旧错误码直到这些网关退役。\n\n原实现的单元测试已通过；添加 Retry-After 后的整体改动尚未重新测试。",
+      "usage": {
+        "input_tokens": 14488,
+        "cached_input_tokens": 8832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 88,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 10.96,
+      "tool_calls": 0,
+      "grade": {
+        "id": "10",
+        "passed": true,
+        "reason": "覆盖旧错误码兼容及 Retry-After，保留旧网关误判原因与退役约束，明确整体未复测。"
+      }
+    },
+    {
+      "case": "06-amend-context",
+      "condition": "without_rules",
+      "output": "兼容旧网关的限流响应并添加 Retry-After\n\n保留 legacyCode=17，兼容合作方仍在运行的 1.8 及更早网关；这些网关只识别该错误码，会将新的错误类型视为传输故障，因此需保留旧错误码直到它们退役。同时为限流响应添加 Retry-After 响应头。\n\n原实现的单元测试已通过；补改后的整体尚未重新测试。",
+      "usage": {
+        "input_tokens": 13407,
+        "cached_input_tokens": 11136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 109,
+        "reasoning_output_tokens": 0
+      },
+      "elapsed_seconds": 9.18,
+      "tool_calls": 0,
+      "grade": {
+        "id": "11",
+        "passed": true,
+        "reason": "完整描述修订后整体，保留旧网关兼容背景，并清楚区分原实现测试通过与补改后未复测。"
+      }
+    }
+  ],
+  "scores": {
+    "without_rules": {
+      "passed": 6,
+      "total": 6
+    },
+    "with_rules": {
+      "passed": 6,
+      "total": 6
+    }
+  },
+  "isolation_probe": [
+    {
+      "requested_model": "gpt-6-astra",
+      "skill_present": false,
+      "reader_hook_present": false,
+      "ponytail_present": false,
+      "condition": "without_rules"
+    },
+    {
+      "requested_model": "gpt-6-astra",
+      "skill_present": true,
+      "reader_hook_present": false,
+      "ponytail_present": false,
+      "condition": "with_rules"
+    }
+  ],
+  "judge": {
+    "model": "gpt-6-astra",
+    "group_labels_hidden": true,
+    "same_model_as_generator": true,
+    "usage": {
+      "input_tokens": 17232,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 504,
+      "reasoning_output_tokens": 27
+    }
+  }
+}
