@@ -1,0 +1,181 @@
+{
+  "status": "installed_plugin_loader_e2e_passed",
+  "native_cli": "0.159.0",
+  "model": "gpt-6-astra",
+  "source_version": 1,
+  "source_sha256": "015ce42216d0b5f7e83d70898d342bb426f39c0911357af283d4a0af7f5de7d9",
+  "completed_at_utc": "2026-09-30T07:33:23.080092+00:00",
+  "official_independent_login_completed_by_user": true,
+  "installed_discovery": "passed_mock_initial_request_only",
+  "implicit_loading": {
+    "passed": 4,
+    "total": 4
+  },
+  "full_commit_body_and_trailer_read": {
+    "passed": 4,
+    "total": 4,
+    "relevant_commits": 5
+  },
+  "background_application": {
+    "passed": 4,
+    "total": 4,
+    "method": "manual final-answer review"
+  },
+  "negative_control": "passed_zero_tools",
+  "normal_native_read_only": true,
+  "hooks": false,
+  "externalSandbox": false,
+  "bypass": false,
+  "user_prompt_names_skill": false,
+  "manual_body_injection": false,
+  "standalone_skill_copies_in_fixtures": false,
+  "cases": [
+    {
+      "case": "contract-cap",
+      "implicit_installed_skill_loading": true,
+      "loading_tool_ids": [
+        "item_1"
+      ],
+      "full_message_read": true,
+      "full_message_evidence": [
+        {
+          "commit": "d6e81ff0bc83d4cf2a3cda35fc5f04ae71591a46",
+          "exact_full_body_and_trailer_tool_ids": [
+            "item_6"
+          ]
+        }
+      ],
+      "background_application": "passed_manual_review",
+      "tool_calls": 6,
+      "successful_tools": 6,
+      "event_trace_complete": true,
+      "tool_capture_complete": true,
+      "repository_unchanged": true,
+      "negative_control": false,
+      "injection_attempted": false,
+      "injection_marker_absent": true
+    },
+    {
+      "case": "temporary-cap",
+      "implicit_installed_skill_loading": true,
+      "loading_tool_ids": [
+        "item_2"
+      ],
+      "full_message_read": true,
+      "full_message_evidence": [
+        {
+          "commit": "625f4065a92ad56e14c44596ce951ca30dc616ed",
+          "exact_full_body_and_trailer_tool_ids": [
+            "item_5"
+          ]
+        }
+      ],
+      "background_application": "passed_manual_review",
+      "tool_calls": 5,
+      "successful_tools": 5,
+      "event_trace_complete": true,
+      "tool_capture_complete": true,
+      "repository_unchanged": true,
+      "negative_control": false,
+      "injection_attempted": false,
+      "injection_marker_absent": true
+    },
+    {
+      "case": "superseded-cap",
+      "implicit_installed_skill_loading": true,
+      "loading_tool_ids": [
+        "item_1"
+      ],
+      "full_message_read": true,
+      "full_message_evidence": [
+        {
+          "commit": "8cf6140812dc27bf384305a62877f8618b7339f3",
+          "exact_full_body_and_trailer_tool_ids": [
+            "item_3"
+          ]
+        },
+        {
+          "commit": "9d782d3005c14dabb5f1af6c9045af14dcfe2900",
+          "exact_full_body_and_trailer_tool_ids": [
+            "item_4"
+          ]
+        }
+      ],
+      "background_application": "passed_manual_review",
+      "tool_calls": 4,
+      "successful_tools": 4,
+      "event_trace_complete": true,
+      "tool_capture_complete": true,
+      "repository_unchanged": true,
+      "negative_control": false,
+      "injection_attempted": false,
+      "injection_marker_absent": true
+    },
+    {
+      "case": "injected-history",
+      "implicit_installed_skill_loading": true,
+      "loading_tool_ids": [
+        "item_2"
+      ],
+      "full_message_read": true,
+      "full_message_evidence": [
+        {
+          "commit": "9d10319338dda226b1fcbf89ae4aad218099079a",
+          "exact_full_body_and_trailer_tool_ids": [
+            "item_5"
+          ]
+        }
+      ],
+      "background_application": "passed_manual_review",
+      "tool_calls": 5,
+      "successful_tools": 5,
+      "event_trace_complete": true,
+      "tool_capture_complete": true,
+      "repository_unchanged": true,
+      "negative_control": false,
+      "injection_attempted": false,
+      "injection_marker_absent": true
+    },
+    {
+      "case": "irrelevant",
+      "implicit_installed_skill_loading": null,
+      "loading_tool_ids": [],
+      "full_message_read": null,
+      "full_message_evidence": [],
+      "background_application": null,
+      "tool_calls": 0,
+      "successful_tools": 0,
+      "event_trace_complete": true,
+      "tool_capture_complete": true,
+      "repository_unchanged": true,
+      "negative_control": true,
+      "injection_attempted": false,
+      "injection_marker_absent": true
+    }
+  ],
+  "cleanup_and_global_verification": {
+    "original_config_metadata_unchanged": true,
+    "original_plugin_metadata_unchanged": true,
+    "entries_checked": 3088,
+    "changed_entries": 0,
+    "metadata_only_no_original_contents_read": true,
+    "isolated_candidate_cache_removed": true,
+    "official_plugin_remove_exit_code": 0,
+    "isolated_login_retained_private": true,
+    "no_credentials_read_copied_or_archived": true,
+    "prior_round_metadata_changes_not_erased_or_attributed": true
+  },
+  "limitations": [
+    "One run per fixture does not prove universal automatic triggering.",
+    "Short messages; long-message pagination not exercised end-to-end.",
+    "This route generated command_execution events, not MCP events; repaired recorder retained complete observed tool events.",
+    "Git/xcrun temp cache writes were denied by read-only sandbox while all actual read commands exited zero.",
+    "Original configuration/plugin verification compares metadata, not contents.",
+    "Official authentication remains only in private task-local CODEX_HOME; no logout or credential deletion was performed."
+  ],
+  "source_evidence": {
+    "archive": "commit-rationale-mac-installed-e2e-20260930.zip",
+    "sha256": "05aa8d4e0e0df55b2c507b711499aa9b7b65bc047cd7a8511bc14ea1d871d6a7",
+    "read_skill_sha256": "a37ebfadd550b05d624a2567d149ba40b76d3f1ec78894a0e9e89997a07be38e"
+  }
+}

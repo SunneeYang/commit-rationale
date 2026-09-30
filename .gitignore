@@ -1,2 +1,4 @@
 plugins/commit-rationale/evals/results/
 benchmarks/__pycache__/
+
+__pycache__/

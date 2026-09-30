@@ -1,0 +1,5 @@
+interface:
+  display_name: "Read Commit History"
+  short_description: "主动读取相关提交的完整背景，结合当前代码与后续变更判断约束"
+policy:
+  allow_implicit_invocation: true

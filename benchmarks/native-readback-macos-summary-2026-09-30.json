@@ -1,0 +1,85 @@
+{
+  "status": "live_tool_execution_blocked",
+  "date": "2026-09-30",
+  "evidence_kind": "terminal report relayed by coordinating task; not recovered raw tool events",
+  "cases": [
+    {
+      "case": "contract-cap",
+      "model_process_exit_code": 0,
+      "terminal": true,
+      "reader_selection_evidence": "agent_message states intent to use read-commit-history",
+      "mcp_tool_calls_observed_minimum": 1,
+      "mcp_tool_calls_exact": null,
+      "raw_mcp_events_retained": false,
+      "successful_skill_load_verified": false,
+      "complete_commit_read_verified": false,
+      "tool_execution_blocker": "sandbox_apply: Operation not permitted",
+      "behavior_verdict": "blocked_not_graded"
+    },
+    {
+      "case": "temporary-cap",
+      "model_process_exit_code": 0,
+      "terminal": true,
+      "reader_selection_evidence": "agent_message states intent to use read-commit-history",
+      "mcp_tool_calls_observed_minimum": 1,
+      "mcp_tool_calls_exact": null,
+      "raw_mcp_events_retained": false,
+      "successful_skill_load_verified": false,
+      "complete_commit_read_verified": false,
+      "tool_execution_blocker": "sandbox_apply: Operation not permitted",
+      "behavior_verdict": "blocked_not_graded"
+    },
+    {
+      "case": "superseded-cap",
+      "model_process_exit_code": 0,
+      "terminal": true,
+      "reader_selection_evidence": "agent_message states intent to use read-commit-history",
+      "mcp_tool_calls_observed_minimum": 1,
+      "mcp_tool_calls_exact": null,
+      "raw_mcp_events_retained": false,
+      "successful_skill_load_verified": false,
+      "complete_commit_read_verified": false,
+      "tool_execution_blocker": "sandbox_apply: Operation not permitted",
+      "behavior_verdict": "blocked_not_graded"
+    },
+    {
+      "case": "injected-history",
+      "model_process_exit_code": 0,
+      "terminal": true,
+      "reader_selection_evidence": "agent_message states intent to use read-commit-history",
+      "mcp_tool_calls_observed_minimum": 1,
+      "mcp_tool_calls_exact": null,
+      "raw_mcp_events_retained": false,
+      "successful_skill_load_verified": false,
+      "complete_commit_read_verified": false,
+      "tool_execution_blocker": "sandbox_apply: Operation not permitted",
+      "behavior_verdict": "blocked_not_graded"
+    },
+    {
+      "case": "irrelevant",
+      "terminal": true,
+      "translation_correct": true,
+      "mcp_tool_calls_exact": 0,
+      "behavior_verdict": "single_negative_control_passed"
+    }
+  ],
+  "recorder_limitation": "Original recorder filtered out mcp_tool_call. Arguments, result, error, status, and exact maintenance call counts cannot be recovered. commands=[] does not mean no tool attempts.",
+  "retry_boundary": "No externalSandbox retry because it would weaken effective protection. No read-skill change for environment failures.",
+  "cleanup_report": {
+    "main_config_metadata_unchanged": true,
+    "existing_plugin_payload_file_metadata_unchanged": true,
+    "test_cache_cleared": true,
+    "remote_install_state_files_with_metadata_changes": 11,
+    "parent_directories_with_metadata_changes": 11,
+    "total_metadata_changes": 22,
+    "observed_change": "inode changed, size unchanged",
+    "time_range_utc": [
+      "2026-09-30T06:26:11.558391Z",
+      "2026-09-30T06:26:11.564368Z"
+    ],
+    "content_changes": "unknown",
+    "cause": "unattributed",
+    "all_old_plugin_metadata_unchanged": false
+  },
+  "automatic_reading_accepted": false
+}

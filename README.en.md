@@ -30,7 +30,7 @@
 
 ## Quick install
 
-Install through your agent's native plugin system. Both hosts share the same skill and history-reading reminder.
+Install through your agent's native plugin system. Both hosts share separate writing and reading skills; reading no longer depends on a session hook.
 
 ### Codex
 
@@ -42,7 +42,7 @@ codex plugin add commit-rationale@commit-rationale
 ```
 
 > [!IMPORTANT]
-> After installing, open `/hooks` in Codex, review and trust this plugin's `SessionStart` hook, then start a new task. If the plugin does not appear in the desktop app, restart the app.
+> Start a new task after installing or updating so the host discovers both `commit-rationale` and `read-commit-history`. On a local Codex host that supports hooks, optionally review and trust `SessionStart` through `/hooks` for an additional reminder. The reading skill does not require hooks. If the plugin does not appear in the desktop app, restart the app.
 
 ### Claude Code
 
@@ -62,7 +62,9 @@ Choose **User scope** to make the plugin available across your projects. Complet
 <summary>Requirements and migration from a standalone skill</summary>
 
 - Git must be able to access this repository.
-- Your Codex or Claude Code version must support plugins and `SessionStart` hooks.
+- Your Codex or Claude Code version must support native plugins and implicit skill selection; `SessionStart` hooks are optional.
+- The task environment must have access to the target Git repository and its local history. Installing a plugin does not grant repository access.
+- The chunked-reading helper requires Python 3 (standard library only); ordinary full messages can be read directly with Git.
 - The hook uses the shell command `cat` and targets macOS/Linux. Windows has not been verified.
 - If you previously installed a standalone skill with the same name, remove that older copy once the plugin is working to avoid duplicate discovery.
 
@@ -177,15 +179,18 @@ After installing, ask your agent directly:
 | Create a commit | `Commit.` |
 | Assess a later change | `Can we extend this timeout? Assess it first; do not modify files.` |
 
-For commit tasks, the agent matches the skill to the request. For maintenance tasks, the reading reminder guides it to consult relevant history when useful. Asking only for a message produces a draft; creating commits, rewriting history, merging, or pushing still follows existing authorization and repository rules.
+Commit requests match the writing skill. Modification, debugging, refactoring, review, and impact-assessment requests can match the reading skill automatically, without mentioning history or naming the skill. It narrows candidates by paths, symbols, or constraints, reads the full messages it relies on, and checks current code and subsequent changes.
+
+Implicit selection is a host capability, not a guarantee that every request triggers a skill. Installation, discovery, actual retrieval, and correct use of evidence must be verified separately. Asking only for a message produces a draft; creating commits, rewriting history, merging, or pushing still follows existing authorization and repository rules.
 
 <details>
 <summary>How do I explicitly invoke the skill?</summary>
 
-In Codex, type `$` and select the plugin's `commit-rationale` skill. In Claude Code, use:
+In Codex, type `$` and select `commit-rationale` (writing) or `read-commit-history` (reading). In Claude Code, use:
 
 ```text
 /commit-rationale:commit-rationale Generate a commit message from the uncommitted changes.
+/commit-rationale:read-commit-history Assess whether this timeout can be extended; do not edit files.
 ```
 
 </details>
@@ -197,19 +202,27 @@ In Codex, type `$` and select the plugin's `commit-rationale` skill. In Claude C
 | Component | Purpose |
 | --- | --- |
 | [Commit skill](plugins/commit-rationale/skills/commit-rationale/SKILL.md) | Selects context worth preserving; regenerates the explanation for the final changes during merge, squash, and amend. |
-| [History-reading reminder](plugins/commit-rationale/context/read-commit-history.md) | Prompts the agent to read full messages for relevant commits and check whether historical constraints still apply. |
-| [Session hook](plugins/commit-rationale/hooks/hooks.json) | Injects the reading reminder when a session starts, resumes, is cleared, or is compacted. |
+| [Reading skill](plugins/commit-rationale/skills/read-commit-history/SKILL.md) | Native task-matching entry point; finds relevant history, reads full bodies and trailers, and checks for later supersession or reverts. |
+| [Chunked reader](plugins/commit-rationale/skills/read-commit-history/scripts/read_commit.py) | Returns explicit continuation offsets for long messages so truncated output is not mistaken for a complete read; reads local Git objects only. |
+| [History-reading reminder](plugins/commit-rationale/context/read-commit-history.md) | Additional local-hook reminder retained for existing installations. |
+| [Session hook](plugins/commit-rationale/hooks/hooks.json) | Optional reminder on local hosts that support and trust hooks; omitted from the public-directory package. |
 
 <details>
 <summary>Does the hook change global configuration or read all history automatically?</summary>
 
 No. The hook reads a static reminder bundled with the plugin and prints it into the session context. It does not run Git queries or modify the global `AGENTS.md`. The agent decides whether to inspect relevant history for the task; it does not preload all commits, and reading history is not guaranteed for every task.
 
-Installing the plugin does not automatically trust its hook. Without hook trust, the commit skill is still available, but the reading reminder is not injected.
+Installing the plugin does not automatically trust its hook. Without hook trust, this additional reminder is not injected, but both skills remain available for implicit selection on supported hosts. Do not assume cloud tasks execute local command hooks.
 
 </details>
 
-The skill and reading reminder each have one shared source. Codex and Claude Code keep only their required marketplace entries and plugin metadata separately.
+Both skills and the reading reminder each have one shared source. Codex and Claude Code keep only their required marketplace entries and plugin metadata separately. Persistent rationale still lives only in Git commit bodies and optional trailers; no database or project state file is added.
+
+Run deterministic local checks with `python3 -m unittest discover -s tests -v`. They cover full-message reading, pagination, fixed commit identity, and read-only boundaries; they do not establish automatic invocation. [Native discovery and behavior checks](benchmarks/native_readback.md) report these separately.
+
+Latest behavior check: the native installed-plugin loader on macOS passed four maintenance fixtures and one translation control. Ordinary requests implicitly loaded the installed skill, read complete relevant messages and trailers, and correctly handled lasting constraints, temporary limits, supersession, and instructions embedded in history. The translation control used zero tools. Each fixture ran once; this does not establish universal triggering, and model-driven long-message pagination was not tested end to end. See the [layered verification record](benchmarks/native_readback.md).
+
+See [public plugin directory submission](docs/marketplace-submission.md) for hook-free packaging and current submission requirements.
 
 ---
 

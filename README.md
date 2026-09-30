@@ -28,7 +28,7 @@
 
 ## 快速安装
 
-通过所用 Agent 的原生插件系统安装，两者共用一份技能和读取提醒。
+通过所用 Agent 的原生插件系统安装，两者共用写入、读取两项技能；读取不再依赖启动钩子。
 
 ### Codex
 
@@ -40,7 +40,7 @@ codex plugin add commit-rationale@commit-rationale
 ```
 
 > [!IMPORTANT]
-> 安装后在 Codex 打开 `/hooks`，审阅并信任本插件的 `SessionStart` 钩子，然后新建任务。桌面端如未显示插件，可重启应用。
+> 安装或更新后新建任务，让宿主发现 `commit-rationale` 与 `read-commit-history` 两项技能。支持本地 hooks 的 Codex 可另行在 `/hooks` 审阅并信任 `SessionStart`，作为补充提醒；读取技能本身不要求 hooks。桌面端如未显示插件，可重启应用。
 
 ### Claude Code
 
@@ -60,7 +60,9 @@ codex plugin add commit-rationale@commit-rationale
 <summary>安装前提与旧技能迁移</summary>
 
 - Git 能够访问本仓库。
-- 使用支持插件和 `SessionStart` hooks 的 Codex 或 Claude Code。
+- 使用支持原生插件及技能自动匹配的 Codex 或 Claude Code；`SessionStart` hooks 仅为可选增强。
+- 执行任务的环境必须能读取目标 Git 仓库和本地提交历史。安装插件不会自动授予仓库访问权限。
+- 分段读取脚本使用 Python 3（仅标准库）；普通完整说明可直接通过 Git 读取。
 - 当前钩子使用 shell 的 `cat`，面向 macOS/Linux；Windows 环境尚未验证。
 - 若之前手动安装过同名独立技能，确认插件可用后移除旧副本，避免重复发现。
 
@@ -175,15 +177,18 @@ codex plugin add commit-rationale@commit-rationale
 | 执行提交 | `提交` |
 | 评估后续改动 | `这个期限还能延长吗？先评估，不修改文件。` |
 
-提交相关请求由 Agent 按任务匹配技能；维护请求由读取提醒引导其按需查阅相关历史。仅请求说明时返回草稿；实际提交、改写历史、合并或推送仍遵循已有授权与仓库规则。
+提交相关请求匹配写入技能；修改、调试、重构、审查及影响评估请求可自动匹配读取技能，不需要在问题里提到“历史”或点名技能。读取时先按路径、符号或约束定位少量候选，完整读取所依赖提交，再检查当前代码和后续变更。
+
+这是宿主提供的隐式技能匹配能力，不能保证每次请求都会触发。安装、技能发现、实际读取和正确运用背景是不同层次，需分别验证。仅请求说明时返回草稿；实际提交、改写历史、合并或推送仍遵循已有授权与仓库规则。
 
 <details>
 <summary>如何明确指定使用这个技能？</summary>
 
-在 Codex 输入 `$` 并选择插件内的 `commit-rationale` 技能；在 Claude Code 使用：
+在 Codex 输入 `$` 并选择插件内的 `commit-rationale`（写入）或 `read-commit-history`（读取）技能；在 Claude Code 可使用：
 
 ```text
 /commit-rationale:commit-rationale 根据未提交改动生成提交信息
+/commit-rationale:read-commit-history 评估这个期限能否延长，不修改文件
 ```
 
 </details>
@@ -195,19 +200,27 @@ codex plugin add commit-rationale@commit-rationale
 | 组成 | 作用 |
 | --- | --- |
 | [提交技能](plugins/commit-rationale/skills/commit-rationale/SKILL.md) | 决定哪些背景值得保留；merge、squash、amend 时根据最终改动重新组织说明。 |
-| [读取提醒](plugins/commit-rationale/context/read-commit-history.md) | 提醒 Agent 读取相关提交的完整说明，核实历史约束是否仍适用。 |
-| [启动钩子](plugins/commit-rationale/hooks/hooks.json) | 在会话启动、恢复、清空及压缩后注入读取提醒。 |
+| [读取技能](plugins/commit-rationale/skills/read-commit-history/SKILL.md) | 原生任务匹配入口；定位相关历史，读取完整正文和 trailers，检查后来是否被替代或撤销。 |
+| [分段读取工具](plugins/commit-rationale/skills/read-commit-history/scripts/read_commit.py) | 对长说明返回明确的后续偏移量，避免把截断输出当作完整读取；只访问本地 Git 对象。 |
+| [读取提醒](plugins/commit-rationale/context/read-commit-history.md) | 本地 hook 的简短补充提醒，保持旧安装方式兼容。 |
+| [启动钩子](plugins/commit-rationale/hooks/hooks.json) | 可选：在支持且已信任 hooks 的本地宿主注入提醒；公共目录包不包含它。 |
 
 <details>
 <summary>钩子会修改全局配置或自动查询所有历史吗？</summary>
 
 不会。钩子只读取插件内的静态提醒并输出到会话上下文，不执行 Git 查询或修改全局 `AGENTS.md`。Agent 再根据任务决定是否查询相关历史，不会预先加载所有提交，也不保证每次任务都会读取历史。
 
-安装插件本身不等于已信任钩子；未信任时仍可使用提交技能，但不会注入读取提醒。
+安装插件本身不等于已信任钩子；未信任时不会注入这段补充提醒，但两项原生技能仍可由支持的宿主自动匹配。云端任务不能假定会执行本地 command hooks。
 
 </details>
 
-技能和读取提醒各维护一份，Codex 与 Claude Code 只保留各自必要的市场清单和插件元数据。
+两项技能和读取提醒各维护一份，Codex 与 Claude Code 只保留各自必要的市场清单和插件元数据。所有长期背景仍在 Git 提交正文和可选 trailers 中，不新增数据库或项目状态文件。
+
+本地确定性检查：`python3 -m unittest discover -s tests -v`。它验证完整读取、分页、不可变提交定位和只读边界，不证明宿主会自动调用技能；[原生发现与行为验收](benchmarks/native_readback.md)将这些结果分开记录。
+
+最新行为验收：macOS 原生安装态插件 loader 已通过四个维护案例及一个翻译负对照。普通请求自动加载已安装技能，读完相关正文与 trailers，并正确处理持续约束、临时限制、后续替代及历史指令注入；翻译负对照零工具调用。每例仅一次，小型案例不代表普遍触发率，长正文分页尚未做模型端到端验证。详见[分层验收记录](benchmarks/native_readback.md)。
+
+[公共插件目录发布准备](docs/marketplace-submission.md)说明无 hook 打包与当前上架要求。
 
 ---
 

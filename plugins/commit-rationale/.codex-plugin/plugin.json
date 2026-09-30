@@ -1,7 +1,7 @@
 {
   "name": "commit-rationale",
-  "version": "0.1.0+codex.20260917123001",
-  "description": "保留有维护价值的提交背景，并在后续开发中按需读取。",
+  "version": "0.1.0+codex.20260930054158",
+  "description": "保留有维护价值的提交背景，并在开发、调试和审查时按任务读取完整历史。",
   "author": {
     "name": "SunneeYang"
   },
@@ -10,7 +10,7 @@
   "interface": {
     "displayName": "Commit Rationale",
     "shortDescription": "记录有价值的提交背景，按需读取历史约束。",
-    "longDescription": "根据当前上下文筛选提交正文，并在会话启动、恢复或压缩后提醒 Agent 按需读取相关提交的完整说明。",
+    "longDescription": "写入技能筛选代码与 diff 无法还原的提交背景；读取技能在开发、调试和审查时按任务匹配相关历史，读取完整正文与 trailers，再结合当前代码及后续变更判断。读取不依赖生命周期钩子，自动匹配取决于宿主技能发现能力。",
     "developerName": "SunneeYang",
     "category": "Productivity",
     "capabilities": [],
