@@ -1,6 +1,6 @@
 {
   "name": "commit-rationale",
-  "version": "0.1.0+codex.20260930054158",
+  "version": "0.2.0",
   "description": "保留有维护价值的提交背景，并在开发、调试和审查时按任务读取完整历史。",
   "author": {
     "name": "SunneeYang"
